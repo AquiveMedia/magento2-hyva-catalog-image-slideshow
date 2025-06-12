@@ -11,6 +11,8 @@ use Psr\Log\LoggerInterface;
 
 class Image extends \Magento\Catalog\Block\Product\Image
 {
+    const XML_PATH_SLIDESHOW_ENABLED = 'catalog/image_slideshow/enable';
+
     /**
      * @var ScopeConfigInterface
      */

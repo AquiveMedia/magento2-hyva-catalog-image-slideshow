@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Magento\Catalog\Block\Product\Image;
+use AquiveMedia\CatalogImageSlideshow\Block\Product\Image;
 use Magento\Framework\Escaper;
 
 /** @var Image $block */
@@ -10,23 +10,8 @@ use Magento\Framework\Escaper;
 
 $hasLoadingAttribute = ($block->getCustomAttributes() ?: [])['loading'] ?? false;
 
-$product = $block->getProduct();
-$galleryImages = $product ? $product->getMediaGalleryImages() : [];
-$galleryCount = $galleryImages ? count($galleryImages) : 0;
-
-$galleryUrls = [];
-if ($galleryImages) {
-    foreach ($galleryImages as $image) {
-        $imageUrl = $this->helper('Magento\Catalog\Helper\Image')
-            ->init($product, 'category_page_grid')
-            ->setImageFile($image->getFile())
-            ->getUrl();
-        if ($imageUrl) {
-            $galleryUrls[] = $imageUrl;
-        }
-    }
-}
-
+$galleryUrls = $block->getGalleryUrls();
+$galleryCount = $galleryUrls ? count($galleryUrls) : 0;
 ?>
 
 <?php if ($galleryCount > 1): ?>
@@ -120,4 +105,3 @@ document.addEventListener('alpine:init', () => {
     }));
 });
 </script>
-<?php

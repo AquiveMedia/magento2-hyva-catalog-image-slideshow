@@ -2,78 +2,47 @@
 
 namespace AquiveMedia\CatalogImageSlideshow\Block\Product;
 
+use AquiveMedia\CatalogImageSlideshow\Api\Config\ConfigInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Block\Product\Image as OriginalImage;
+use Magento\Catalog\Helper\ImageFactory;
 use Magento\Catalog\Model\ProductRepository;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template\Context;
-use Psr\Log\LoggerInterface;
 
-class Image extends \Magento\Catalog\Block\Product\Image
+class Image extends OriginalImage
 {
-    const XML_PATH_SLIDESHOW_ENABLED = 'catalog/image_slideshow/enable';
-    /**
-     * @var ScopeConfigInterface
-     */
-    protected $_scopeConfig;
+    protected const ORIGINAL_TEMPLATE_PATH = 'product/list/image.phtml';
+    protected const AQUIVEMEDIA_TEMPLATE_PATH = 'AquiveMedia_CatalogImageSlideshow::product/list/image.phtml';
 
-    /**
-     * @var ProductRepository
-     */
-    protected $_productRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $_logger;
-
-    /**
-     * @param Context $context
-     * @param ScopeConfigInterface $scopeConfig
-     * @param ProductRepository $productRepository
-     * @param LoggerInterface $logger
-     * @param array $data
-     */
     public function __construct(
-        Context              $context,
-        ScopeConfigInterface $scopeConfig,
-        ProductRepository    $productRepository,
-        LoggerInterface      $logger,
-        array                $data = []
-    ){
-        $this->_scopeConfig = $scopeConfig;
-        $this->_productRepository = $productRepository;
-        $this->_logger = $logger;
+        Context                     $context,
+        protected ConfigInterface   $config,
+        protected ProductRepository $productRepository,
+        protected ImageFactory      $imageFactory,
+        array                       $data = []
+    ) {
         parent::__construct($context, $data);
     }
 
-    /**
-     * @return bool
-     */
     public function slideShowEnabled(): bool
     {
-        try {
-            return $this->_scopeConfig->getValue(self::XML_PATH_SLIDESHOW_ENABLED);
-        } catch (\Throwable $e) {
-            $this->_logger->error('Error getting slideshow enabled config: ' . $e->getMessage());
-            return false;
-        }
+        return $this->config->isEnabled();
     }
 
     /**
-     * @param $template
-     * @return Image
+     * @throws NoSuchEntityException
      */
-    public function setTemplate($template)
+    public function setTemplate($template): Image
     {
-        if ($this->slideShowEnabled()) {
-            // Check if the template is the default product image template (This is the path for Hyva Themes)
-            if ($this->getProduct() !== null){
-                if (str_contains($template, 'product/list/image.phtml')) {
-                    $template = 'AquiveMedia_CatalogImageSlideshow::product/list/image.phtml';
-                }
-            }
+        if (
+            $this->slideShowEnabled()
+            && $this->getProduct() !== null
+            && str_contains($template, Image::ORIGINAL_TEMPLATE_PATH)
+        ) {
+            $template = Image::AQUIVEMEDIA_TEMPLATE_PATH;
         }
+
         return parent::setTemplate($template);
     }
 
@@ -84,11 +53,31 @@ class Image extends \Magento\Catalog\Block\Product\Image
     public function getProduct()
     {
         try {
-            $productId = $this->getProductId();
-            $product = $this->_productRepository->getById($productId);
-            return $product;
+            return $this->productRepository->getById($this->getProductId());
         } catch (NoSuchEntityException $e) {
             return null;
         }
+    }
+
+    public function getGalleryUrls(): array
+    {
+        $product = $this->getProduct();
+        if (!$product) {
+            return [];
+        }
+        $galleryImages = $product->getMediaGalleryImages() ?: [];
+
+        if (!$galleryImages->getSize()) {
+            return [];
+        }
+
+        $imageHelper = $this->imageFactory->create();
+
+        return array_filter(array_map(function ($image) use ($product, $imageHelper) {
+            return $imageHelper
+                ->init($product, 'category_page_grid')
+                ->setImageFile($image->getFile())
+                ->getUrl();
+        }, $galleryImages->getItems()));
     }
 }

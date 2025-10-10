@@ -11,7 +11,6 @@ A Magento 2 module that adds an interactive image slideshow to product listings 
 - **Interactive Slideshow** - Hover over product images to browse gallery
 - **Performance Optimized** - Lazy loading with viewport detection
 - **Visual Indicators** - Dots show current image and total count
-- **Responsive Design** - Works seamlessly across all devices
 - **Admin Configuration** - Enable/disable via Magento admin
 - **Hyvä themes only** - Built with Alpine.js and Tailwind CSS for Hyvä
 

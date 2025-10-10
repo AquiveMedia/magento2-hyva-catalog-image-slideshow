@@ -10,12 +10,19 @@ use Throwable;
 
 class Config implements ConfigInterface
 {
+    /**
+     * @param ScopeConfigInterface $scopeConfig
+     * @param LoggerInterface $logger
+     */
     public function __construct(
         protected ScopeConfigInterface $scopeConfig,
         protected LoggerInterface      $logger
     ) {
     }
 
+    /**
+     * @return bool
+     */
     public function isEnabled(): bool
     {
         try {

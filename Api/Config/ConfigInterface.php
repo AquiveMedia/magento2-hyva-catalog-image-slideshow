@@ -10,5 +10,8 @@ interface ConfigInterface
 {
     public const CATALOG_IMAGE_SLIDESHOW_ENABLED_PATH = 'catalog/image_slideshow/enable';
 
+    /**
+     * @return bool
+     */
     public function isEnabled(): bool;
 }

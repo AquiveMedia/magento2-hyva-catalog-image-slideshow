@@ -15,6 +15,13 @@ class Image extends OriginalImage
     protected const ORIGINAL_TEMPLATE_PATH = 'product/list/image.phtml';
     protected const AQUIVEMEDIA_TEMPLATE_PATH = 'AquiveMedia_CatalogImageSlideshow::product/list/image.phtml';
 
+    /**
+     * @param Context $context
+     * @param ConfigInterface $config
+     * @param ProductRepository $productRepository
+     * @param ImageFactory $imageFactory
+     * @param array $data
+     */
     public function __construct(
         Context                     $context,
         protected ConfigInterface   $config,
@@ -26,6 +33,9 @@ class Image extends OriginalImage
         parent::__construct($context, $data);
     }
 
+    /**
+     * @return bool
+     */
     public function slideShowEnabled(): bool
     {
         return $this->config->isEnabled();
@@ -60,6 +70,10 @@ class Image extends OriginalImage
         }
     }
 
+    /**
+     * @return array
+     * @throws NoSuchEntityException
+     */
     public function getGalleryUrls(): array
     {
         $product = $this->getProduct();

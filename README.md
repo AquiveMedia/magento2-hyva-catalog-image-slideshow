@@ -58,6 +58,20 @@ bin/magento cache:clean
 - **Hyvä Theme**: 1.2.3 or higher
 - **PHP**: 8.1 or higher
 
+## Tested On
+
+Explicitly tested on 
+
+- **Magento**: 2.4.8-p2
+- **Hyvä Theme**: 1.3.17
+- **PHP**: 8.3.23
+
+And 
+
+- **Magento**: 2.4.7-p6
+- **Hyvä Theme**: 1.3.9
+- **PHP**: 8.2.5
+
 ## How It Works
 
 ### Technical Implementation
@@ -79,12 +93,11 @@ This is a first version. When you have suggestions for improvements open a Githu
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-
 ## Support
 
 For support, please submit a Github issue
 
 ---
 
-**Made with ❤️**
+**Made with ❤️ at Magetitans Hackaton**
 

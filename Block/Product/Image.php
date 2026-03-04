@@ -13,8 +13,8 @@ use Magento\Framework\View\Element\Template\Context;
 
 class Image extends OriginalImage
 {
-    protected const ORIGINAL_TEMPLATE_PATH = 'product/list/image.phtml';
-    protected const AQUIVEMEDIA_TEMPLATE_PATH = 'AquiveMedia_CatalogImageSlideshow::product/list/image.phtml';
+    protected const string ORIGINAL_TEMPLATE_PATH = 'product/list/image.phtml';
+    protected const string AQUIVEMEDIA_TEMPLATE_PATH = 'AquiveMedia_CatalogImageSlideshow::product/list/image.phtml';
 
     /**
      * @param Context $context

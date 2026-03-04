@@ -6,6 +6,7 @@ use AquiveMedia\CatalogImageSlideshow\Api\Config\ConfigInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Block\Product\Image as OriginalImage;
 use Magento\Catalog\Helper\ImageFactory;
+use Magento\Catalog\Model\Product\Gallery\ReadHandler as GalleryReadHandler;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template\Context;
@@ -20,14 +21,16 @@ class Image extends OriginalImage
      * @param ConfigInterface $config
      * @param ProductRepository $productRepository
      * @param ImageFactory $imageFactory
+     * @param GalleryReadHandler $galleryReadHandler
      * @param array $data
      */
     public function __construct(
-        Context                     $context,
-        protected ConfigInterface   $config,
-        protected ProductRepository $productRepository,
-        protected ImageFactory      $imageFactory,
-        array                       $data = []
+        Context                      $context,
+        protected ConfigInterface    $config,
+        protected ProductRepository  $productRepository,
+        protected ImageFactory       $imageFactory,
+        protected GalleryReadHandler $galleryReadHandler,
+        array                        $data = []
     )
     {
         parent::__construct($context, $data);
@@ -42,13 +45,14 @@ class Image extends OriginalImage
     }
 
     /**
-     * @throws NoSuchEntityException
+     * @param string $template
+     * @return Image
      */
     public function setTemplate($template): Image
     {
         if (
             $this->slideShowEnabled()
-            && $this->getProduct() !== null
+            && $this->getProductId()
             && str_contains($template, Image::ORIGINAL_TEMPLATE_PATH)
         ) {
             $template = Image::AQUIVEMEDIA_TEMPLATE_PATH;
@@ -58,21 +62,32 @@ class Image extends OriginalImage
     }
 
     /**
-     * @return ProductInterface|mixed|null
-     * @throws NoSuchEntityException
+     * @return ProductInterface|null
      */
     public function getProduct()
     {
+        $product = $this->getData('product_object');
+        if ($product instanceof ProductInterface) {
+            if (!$product->hasData('media_gallery')) {
+                $this->galleryReadHandler->execute($product);
+            }
+            return $product;
+        }
+
         try {
-            return $this->productRepository->getById($this->getProductId());
+            $productId = $this->getProductId();
+            if ($productId) {
+                return $this->productRepository->getById($productId);
+            }
         } catch (NoSuchEntityException $e) {
             return null;
         }
+
+        return null;
     }
 
     /**
      * @return array
-     * @throws NoSuchEntityException
      */
     public function getGalleryUrls(): array
     {

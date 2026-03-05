@@ -2,6 +2,7 @@
   "name": "aquivemedia/module-hyva-catalog-image-slideshow",
   "description": "N/A",
   "type": "magento2-module",
+  "license": "GPL-3.0-or-later",
   "require": {
     "magento/framework": "*",
     "magento/module-catalog": "*",
